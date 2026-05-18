@@ -261,5 +261,4 @@ oc port-forward svc/<service-name> 8080:8080
 ## Resources
 
 - [OpenShift AI Documentation](https://access.redhat.com/documentation/en-us/red_hat_openshift_ai)
-- [Data Science Pipelines Guide](https://access.redhat.com/documentation/en-us/red_hat_openshift_ai/1/html/working_on_data_science_projects/working-with-data-science-pipelines)
 - [KFP SDK Documentation](https://kubeflow-pipelines.readthedocs.io/)
