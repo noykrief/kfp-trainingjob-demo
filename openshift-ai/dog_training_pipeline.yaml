@@ -88,9 +88,9 @@ deploymentSpec:
           \ for demo purposes\"\"\"\n        breeds = ['labrador', 'golden_retriever',\
           \ 'german_shepherd', 'bulldog', 'poodle']\n\n        train_dir = os.path.join(data_dir,\
           \ 'train')\n        val_dir = os.path.join(data_dir, 'val')\n\n        print(f\"\
-          \U0001F4E6 Creating dataset in: {data_dir}\")\n\n        for split_dir in\
-          \ [train_dir, val_dir]:\n            for breed in breeds:\n            \
-          \    breed_dir = os.path.join(split_dir, breed)\n                os.makedirs(breed_dir,\
+          \ Creating dataset in: {data_dir}\")\n\n        for split_dir in [train_dir,\
+          \ val_dir]:\n            for breed in breeds:\n                breed_dir\
+          \ = os.path.join(split_dir, breed)\n                os.makedirs(breed_dir,\
           \ exist_ok=True)\n\n                num_samples = num_samples_per_breed\
           \ if split_dir == train_dir else num_samples_per_breed // 5\n\n        \
           \        for i in range(num_samples):\n                    img_path = os.path.join(breed_dir,\
@@ -101,7 +101,7 @@ deploymentSpec:
           \                                            random.randint(50, 255),\n\
           \                                            random.randint(50, 255)))\n\
           \                        img.save(img_path, quality=85)\n\n        print(f\"\
-          \u2705 Dataset created: {len(breeds)} breeds\")\n        print(f\"   Training:\
+          \ Dataset created: {len(breeds)} breeds\")\n        print(f\"   Training:\
           \ {num_samples_per_breed * len(breeds)} images\")\n        print(f\"   Validation:\
           \ {(num_samples_per_breed // 5) * len(breeds)} images\")\n\n        return\
           \ breeds\n\n    # Model definition\n    class DogBreedClassifier(nn.Module):\n\
@@ -111,44 +111,43 @@ deploymentSpec:
           \            num_features = self.backbone.fc.in_features\n            self.backbone.fc\
           \ = nn.Linear(num_features, num_classes)\n\n        def forward(self, x):\n\
           \            return self.backbone(x)\n\n    # Main training logic\n    print(\"\
-          =\" * 70)\n    print(\"\U0001F415 DOG BREED CLASSIFICATION TRAINING\")\n\
-          \    print(\"=\" * 70)\n    print(f\"Started: {datetime.now()}\")\n    print(f\"\
-          Data: {data_dir}\")\n    print(f\"Models: {model_dir}\")\n    print(f\"\
-          Epochs: {epochs} | Batch: {batch_size} | LR: {learning_rate}\")\n    print(\"\
+          =\" * 70)\n    print(\" DOG BREED CLASSIFICATION TRAINING\")\n    print(\"\
+          =\" * 70)\n    print(f\"Started: {datetime.now()}\")\n    print(f\"Data:\
+          \ {data_dir}\")\n    print(f\"Models: {model_dir}\")\n    print(f\"Epochs:\
+          \ {epochs} | Batch: {batch_size} | LR: {learning_rate}\")\n    print(\"\
           =\" * 70)\n\n    # Create directories\n    os.makedirs(model_dir, exist_ok=True)\n\
           \n    # Check/create dataset\n    train_path = os.path.join(data_dir, 'train')\n\
           \    if not os.path.exists(train_path) or len(os.listdir(train_path)) ==\
-          \ 0:\n        print(\"\\n\U0001F4E6 Creating sample dataset...\")\n    \
-          \    breeds = create_sample_dataset(data_dir)\n    else:\n        print(\"\
-          \\n\U0001F4E6 Using existing dataset\")\n        breeds = sorted([d for\
-          \ d in os.listdir(train_path)\n                        if os.path.isdir(os.path.join(train_path,\
-          \ d))])\n\n    num_classes = len(breeds)\n    print(f\"\\n\U0001F3AF Training\
-          \ for {num_classes} breeds: {', '.join(breeds)}\")\n\n    # Setup device\n\
-          \    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\n\
-          \    print(f\"\\n\U0001F4BB Device: {device}\")\n    if device.type == 'cuda':\n\
-          \        print(f\"   GPU: {torch.cuda.get_device_name(0)}\")\n\n    # Data\
-          \ transforms\n    train_transforms = transforms.Compose([\n        transforms.Resize(256),\n\
-          \        transforms.RandomCrop(224),\n        transforms.RandomHorizontalFlip(),\n\
-          \        transforms.ToTensor(),\n        transforms.Normalize([0.485, 0.456,\
-          \ 0.406], [0.229, 0.224, 0.225])\n    ])\n\n    val_transforms = transforms.Compose([\n\
-          \        transforms.Resize(256),\n        transforms.CenterCrop(224),\n\
-          \        transforms.ToTensor(),\n        transforms.Normalize([0.485, 0.456,\
-          \ 0.406], [0.229, 0.224, 0.225])\n    ])\n\n    # Load datasets\n    print(\"\
-          \\n\U0001F4CA Loading datasets...\")\n    train_dataset = datasets.ImageFolder(os.path.join(data_dir,\
-          \ 'train'),\n                                        transform=train_transforms)\n\
-          \    val_dataset = datasets.ImageFolder(os.path.join(data_dir, 'val'),\n\
+          \ 0:\n        print(\"\\n Creating sample dataset...\")\n        breeds\
+          \ = create_sample_dataset(data_dir)\n    else:\n        print(\"\\n Using\
+          \ existing dataset\")\n        breeds = sorted([d for d in os.listdir(train_path)\n\
+          \                        if os.path.isdir(os.path.join(train_path, d))])\n\
+          \n    num_classes = len(breeds)\n    print(f\"\\n Training for {num_classes}\
+          \ breeds: {', '.join(breeds)}\")\n\n    # Setup device\n    device = torch.device('cuda'\
+          \ if torch.cuda.is_available() else 'cpu')\n    print(f\"\\n Device: {device}\"\
+          )\n    if device.type == 'cuda':\n        print(f\"   GPU: {torch.cuda.get_device_name(0)}\"\
+          )\n\n    # Data transforms\n    train_transforms = transforms.Compose([\n\
+          \        transforms.Resize(256),\n        transforms.RandomCrop(224),\n\
+          \        transforms.RandomHorizontalFlip(),\n        transforms.ToTensor(),\n\
+          \        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])\n\
+          \    ])\n\n    val_transforms = transforms.Compose([\n        transforms.Resize(256),\n\
+          \        transforms.CenterCrop(224),\n        transforms.ToTensor(),\n \
+          \       transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])\n\
+          \    ])\n\n    # Load datasets\n    print(\"\\n Loading datasets...\")\n\
+          \    train_dataset = datasets.ImageFolder(os.path.join(data_dir, 'train'),\n\
+          \                                        transform=train_transforms)\n \
+          \   val_dataset = datasets.ImageFolder(os.path.join(data_dir, 'val'),\n\
           \                                      transform=val_transforms)\n\n   \
           \ train_loader = DataLoader(train_dataset, batch_size=batch_size,\n    \
-          \                         shuffle=True, num_workers=2)\n    val_loader =\
+          \                         shuffle=True, num_workers=0)\n    val_loader =\
           \ DataLoader(val_dataset, batch_size=batch_size,\n                     \
-          \      shuffle=False, num_workers=2)\n\n    print(f\"   Train batches: {len(train_loader)}\"\
+          \      shuffle=False, num_workers=0)\n\n    print(f\"   Train batches: {len(train_loader)}\"\
           )\n    print(f\"   Val batches: {len(val_loader)}\")\n\n    # Initialize\
-          \ model\n    print(\"\\n\U0001F3D7\uFE0F  Building model...\")\n    model\
-          \ = DogBreedClassifier(num_classes=num_classes, pretrained=use_pretrained)\n\
-          \    model = model.to(device)\n\n    criterion = nn.CrossEntropyLoss()\n\
-          \    optimizer = optim.Adam(model.parameters(), lr=learning_rate)\n\n  \
-          \  # Training loop\n    print(\"\\n\U0001F680 Training started...\\n\")\n\
-          \    metrics = []\n    best_val_acc = 0.0\n\n    for epoch in range(epochs):\n\
+          \ model\n    print(\"\\n Building model...\")\n    model = DogBreedClassifier(num_classes=num_classes,\
+          \ pretrained=use_pretrained)\n    model = model.to(device)\n\n    criterion\
+          \ = nn.CrossEntropyLoss()\n    optimizer = optim.Adam(model.parameters(),\
+          \ lr=learning_rate)\n\n    # Training loop\n    print(\"\\n Training started...\\\
+          n\")\n    metrics = []\n    best_val_acc = 0.0\n\n    for epoch in range(epochs):\n\
           \        print(f\"Epoch {epoch+1}/{epochs}\")\n        print(\"-\" * 50)\n\
           \n        # Training phase\n        model.train()\n        train_loss =\
           \ 0.0\n        train_correct = 0\n        train_total = 0\n\n        for\
@@ -181,23 +180,22 @@ deploymentSpec:
           \ epoch + 1,\n                'model_state_dict': model.state_dict(),\n\
           \                'optimizer_state_dict': optimizer.state_dict(),\n     \
           \           'val_acc': val_acc,\n                'class_names': train_dataset.classes\n\
-          \            }, best_model_path)\n            print(f\"  \u2713 Saved best\
-          \ model (Val Acc: {val_acc:.2f}%)\")\n\n        print()\n\n    # Save final\
-          \ model\n    final_model_path = os.path.join(model_dir, 'final_model.pth')\n\
-          \    torch.save({\n        'epoch': epochs,\n        'model_state_dict':\
-          \ model.state_dict(),\n        'optimizer_state_dict': optimizer.state_dict(),\n\
-          \        'class_names': train_dataset.classes\n    }, final_model_path)\n\
-          \n    # Save metrics\n    metrics_path = os.path.join(model_dir, 'metrics.json')\n\
-          \    with open(metrics_path, 'w') as f:\n        json.dump({\n         \
-          \   'metrics': metrics,\n            'best_val_acc': best_val_acc,\n   \
-          \         'num_classes': num_classes,\n            'class_names': train_dataset.classes,\n\
-          \            'hyperparameters': {\n                'epochs': epochs,\n \
-          \               'batch_size': batch_size,\n                'learning_rate':\
-          \ learning_rate,\n                'use_pretrained': use_pretrained\n   \
-          \         }\n        }, f, indent=2)\n\n    # Save class names\n    class_names_path\
-          \ = os.path.join(model_dir, 'class_names.txt')\n    with open(class_names_path,\
-          \ 'w') as f:\n        f.write('\\n'.join(train_dataset.classes))\n\n   \
-          \ print(\"=\" * 70)\n    print(\"\u2705 TRAINING COMPLETE!\")\n    print(f\"\
+          \            }, best_model_path)\n            print(f\"   Saved best model\
+          \ (Val Acc: {val_acc:.2f}%)\")\n\n        print()\n\n    # Save final model\n\
+          \    final_model_path = os.path.join(model_dir, 'final_model.pth')\n   \
+          \ torch.save({\n        'epoch': epochs,\n        'model_state_dict': model.state_dict(),\n\
+          \        'optimizer_state_dict': optimizer.state_dict(),\n        'class_names':\
+          \ train_dataset.classes\n    }, final_model_path)\n\n    # Save metrics\n\
+          \    metrics_path = os.path.join(model_dir, 'metrics.json')\n    with open(metrics_path,\
+          \ 'w') as f:\n        json.dump({\n            'metrics': metrics,\n   \
+          \         'best_val_acc': best_val_acc,\n            'num_classes': num_classes,\n\
+          \            'class_names': train_dataset.classes,\n            'hyperparameters':\
+          \ {\n                'epochs': epochs,\n                'batch_size': batch_size,\n\
+          \                'learning_rate': learning_rate,\n                'use_pretrained':\
+          \ use_pretrained\n            }\n        }, f, indent=2)\n\n    # Save class\
+          \ names\n    class_names_path = os.path.join(model_dir, 'class_names.txt')\n\
+          \    with open(class_names_path, 'w') as f:\n        f.write('\\n'.join(train_dataset.classes))\n\
+          \n    print(\"=\" * 70)\n    print(\" TRAINING COMPLETE!\")\n    print(f\"\
           \   Best Validation Accuracy: {best_val_acc:.2f}%\")\n    print(f\"   Models\
           \ saved to: {model_dir}\")\n    print(f\"   Completed: {datetime.now()}\"\
           )\n    print(\"=\" * 70)\n\n"
@@ -224,14 +222,14 @@ root:
               componentInputParameter: batch_size
             data_dir:
               runtimeValue:
-                constant: /data
+                constant: /pvc/data
             epochs:
               componentInputParameter: epochs
             learning_rate:
               componentInputParameter: learning_rate
             model_dir:
               runtimeValue:
-                constant: /models
+                constant: /pvc/models
             use_pretrained:
               componentInputParameter: use_pretrained
         taskInfo:
@@ -273,12 +271,6 @@ platforms:
         exec-train-dog-classifier:
           pvcMount:
           - componentInputParameter: pvc_name
-            mountPath: /data
+            mountPath: /pvc
             pvcNameParameter:
               componentInputParameter: pvc_name
-            subPath: data
-          - componentInputParameter: pvc_name
-            mountPath: /models
-            pvcNameParameter:
-              componentInputParameter: pvc_name
-            subPath: models

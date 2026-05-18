@@ -48,7 +48,7 @@ def train_dog_classifier(
         train_dir = os.path.join(data_dir, 'train')
         val_dir = os.path.join(data_dir, 'val')
 
-        print(f"📦 Creating dataset in: {data_dir}")
+        print(f" Creating dataset in: {data_dir}")
 
         for split_dir in [train_dir, val_dir]:
             for breed in breeds:
@@ -68,7 +68,7 @@ def train_dog_classifier(
                                             random.randint(50, 255)))
                         img.save(img_path, quality=85)
 
-        print(f"✅ Dataset created: {len(breeds)} breeds")
+        print(f" Dataset created: {len(breeds)} breeds")
         print(f"   Training: {num_samples_per_breed * len(breeds)} images")
         print(f"   Validation: {(num_samples_per_breed // 5) * len(breeds)} images")
 
@@ -88,7 +88,7 @@ def train_dog_classifier(
 
     # Main training logic
     print("=" * 70)
-    print("🐕 DOG BREED CLASSIFICATION TRAINING")
+    print(" DOG BREED CLASSIFICATION TRAINING")
     print("=" * 70)
     print(f"Started: {datetime.now()}")
     print(f"Data: {data_dir}")
@@ -102,19 +102,19 @@ def train_dog_classifier(
     # Check/create dataset
     train_path = os.path.join(data_dir, 'train')
     if not os.path.exists(train_path) or len(os.listdir(train_path)) == 0:
-        print("\n📦 Creating sample dataset...")
+        print("\n Creating sample dataset...")
         breeds = create_sample_dataset(data_dir)
     else:
-        print("\n📦 Using existing dataset")
+        print("\n Using existing dataset")
         breeds = sorted([d for d in os.listdir(train_path)
                         if os.path.isdir(os.path.join(train_path, d))])
 
     num_classes = len(breeds)
-    print(f"\n🎯 Training for {num_classes} breeds: {', '.join(breeds)}")
+    print(f"\n Training for {num_classes} breeds: {', '.join(breeds)}")
 
     # Setup device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"\n💻 Device: {device}")
+    print(f"\n Device: {device}")
     if device.type == 'cuda':
         print(f"   GPU: {torch.cuda.get_device_name(0)}")
 
@@ -135,22 +135,22 @@ def train_dog_classifier(
     ])
 
     # Load datasets
-    print("\n📊 Loading datasets...")
+    print("\n Loading datasets...")
     train_dataset = datasets.ImageFolder(os.path.join(data_dir, 'train'),
                                         transform=train_transforms)
     val_dataset = datasets.ImageFolder(os.path.join(data_dir, 'val'),
                                       transform=val_transforms)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size,
-                             shuffle=True, num_workers=2)
+                             shuffle=True, num_workers=0)
     val_loader = DataLoader(val_dataset, batch_size=batch_size,
-                           shuffle=False, num_workers=2)
+                           shuffle=False, num_workers=0)
 
     print(f"   Train batches: {len(train_loader)}")
     print(f"   Val batches: {len(val_loader)}")
 
     # Initialize model
-    print("\n🏗️  Building model...")
+    print("\n Building model...")
     model = DogBreedClassifier(num_classes=num_classes, pretrained=use_pretrained)
     model = model.to(device)
 
@@ -158,7 +158,7 @@ def train_dog_classifier(
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     # Training loop
-    print("\n🚀 Training started...\n")
+    print("\n Training started...\n")
     metrics = []
     best_val_acc = 0.0
 
@@ -234,7 +234,7 @@ def train_dog_classifier(
                 'val_acc': val_acc,
                 'class_names': train_dataset.classes
             }, best_model_path)
-            print(f"  ✓ Saved best model (Val Acc: {val_acc:.2f}%)")
+            print(f"   Saved best model (Val Acc: {val_acc:.2f}%)")
 
         print()
 
@@ -269,7 +269,7 @@ def train_dog_classifier(
         f.write('\n'.join(train_dataset.classes))
 
     print("=" * 70)
-    print("✅ TRAINING COMPLETE!")
+    print(" TRAINING COMPLETE!")
     print(f"   Best Validation Accuracy: {best_val_acc:.2f}%")
     print(f"   Models saved to: {model_dir}")
     print(f"   Completed: {datetime.now()}")
@@ -300,8 +300,8 @@ def dog_training_pipeline(
 
     # Create training task
     train_task = train_dog_classifier(
-        data_dir="/data",
-        model_dir="/models",
+        data_dir="/pvc/data",
+        model_dir="/pvc/models",
         epochs=epochs,
         batch_size=batch_size,
         learning_rate=learning_rate,
@@ -312,15 +312,7 @@ def dog_training_pipeline(
     kubernetes.mount_pvc(
         train_task,
         pvc_name=pvc_name,
-        mount_path="/data",
-        sub_path="data"
-    )
-
-    kubernetes.mount_pvc(
-        train_task,
-        pvc_name=pvc_name,
-        mount_path="/models",
-        sub_path="models"
+        mount_path="/pvc"
     )
 
     # Set resource requests and limits
@@ -344,11 +336,11 @@ if __name__ == "__main__":
     )
 
     print("=" * 70)
-    print("✅ Pipeline compiled successfully!")
+    print(" Pipeline compiled successfully!")
     print("=" * 70)
     print(f"Output: {output_file}")
     print()
-    print("📋 Next steps:")
+    print(" Next steps:")
     print("1. Upload to OpenShift AI Dashboard")
     print("   - Go to Data Science Pipelines")
     print("   - Click 'Import pipeline'")
