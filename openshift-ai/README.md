@@ -33,10 +33,12 @@ This creates: `dog_training_pipeline.yaml`
 
 **Option A: Using UI**
 
-1. Go to OpenShift AI Dashboard
+1. Find and access OpenShift AI Dashboard:
+   ```bash
+   # Get dashboard URL
+   oc get route -n redhat-ods-applications | grep dashboard
    ```
-   https://rhods-dashboard-redhat-ods-applications.apps.ocp.v6jqb.sandbox5295.opentlc.com
-   ```
+   Or access via OpenShift Console → Networking → Routes
 
 2. Navigate to your Data Science Project: `dog-classification-demo`
 

@@ -59,8 +59,8 @@ oc get pvc training-data-pvc
 ### Option A: Using OpenShift AI UI
 
 1. **Open OpenShift AI Dashboard**
-   - Go to: https://rhods-dashboard-redhat-ods-applications.apps.ocp.v6jqb.sandbox5295.opentlc.com
-   - Or find it: `oc get route -n redhat-ods-applications | grep dashboard`
+   - Find URL: `oc get route -n redhat-ods-applications | grep dashboard`
+   - Or via OpenShift Console: Networking → Routes → search "dashboard"
 
 2. **Navigate to Data Science Pipelines**
    - Click on your Data Science Project

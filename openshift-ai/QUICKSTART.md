@@ -14,16 +14,18 @@ Get your dog breed classifier training in 3 minutes on OpenShift AI.
 
 ### Step 1: Access OpenShift AI Dashboard (30 seconds)
 
+Find the dashboard URL:
+
 ```bash
-# Find the dashboard URL
 export PATH="$HOME/bin:$PATH"
 oc get route -n redhat-ods-applications | grep dashboard
 ```
 
-Or go directly to:
-```
-https://rhods-dashboard-redhat-ods-applications.apps.ocp.v6jqb.sandbox5295.opentlc.com
-```
+Or access via OpenShift Console:
+- Login to OpenShift Console
+- Navigate to **Networking** → **Routes**
+- Search for "dashboard" in `redhat-ods-applications` namespace
+- Click the URL
 
 Login with:
 - Username: `admin`
