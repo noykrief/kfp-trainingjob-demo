@@ -5,7 +5,6 @@ Simple KFP pipeline for training a dog breed classifier
 from kfp import dsl
 from kfp import kubernetes
 
-
 @dsl.component(
     base_image="pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime",
     packages_to_install=["torchvision>=0.15.0", "Pillow>=9.0.0"]
@@ -16,7 +15,8 @@ def train_dog_classifier(
     epochs: int = 10,
     batch_size: int = 32,
     learning_rate: float = 0.001,
-    use_pretrained: bool = True
+    use_pretrained: bool = True,
+    metrics_out: dsl.Output[dsl.Metrics] = None
 ):
     """
     Train dog breed classifier using PyTorch
@@ -275,6 +275,15 @@ def train_dog_classifier(
     print(f"   Completed: {datetime.now()}")
     print("=" * 70)
 
+    # Log metrics for KFP UI visualization
+    if metrics_out is not None:
+        metrics_out.log_metric('best_val_accuracy', float(best_val_acc))
+        metrics_out.log_metric('final_train_accuracy', float(metrics[-1]['train_acc']))
+        metrics_out.log_metric('final_val_accuracy', float(metrics[-1]['val_acc']))
+        metrics_out.log_metric('final_train_loss', float(metrics[-1]['train_loss']))
+        metrics_out.log_metric('final_val_loss', float(metrics[-1]['val_loss']))
+        metrics_out.log_metric('num_epochs', epochs)
+
 
 @dsl.pipeline(
     name="Dog Breed Classifier Training",
@@ -322,6 +331,9 @@ def dog_training_pipeline(
     # Optional: Request GPU (uncomment if GPU available)
     # train_task.set_accelerator_type('nvidia.com/gpu')
     # train_task.set_accelerator_limit('1')
+
+    # Log metrics for visualization and comparison
+    # The NamedTuple outputs are automatically captured by KFP
 
 
 if __name__ == "__main__":

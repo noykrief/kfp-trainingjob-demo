@@ -42,6 +42,12 @@ components:
           description: Use pretrained ResNet18 weights
           isOptional: true
           parameterType: BOOLEAN
+    outputDefinitions:
+      artifacts:
+        metrics_out:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
 deploymentSpec:
   executors:
     exec-train-dog-classifier:
@@ -73,15 +79,16 @@ deploymentSpec:
         - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
           \ *\n\ndef train_dog_classifier(\n    data_dir: str = \"/data\",\n    model_dir:\
           \ str = \"/models\",\n    epochs: int = 10,\n    batch_size: int = 32,\n\
-          \    learning_rate: float = 0.001,\n    use_pretrained: bool = True\n):\n\
-          \    \"\"\"\n    Train dog breed classifier using PyTorch\n\n    Args:\n\
-          \        data_dir: Directory containing training data\n        model_dir:\
-          \ Directory to save trained models\n        epochs: Number of training epochs\n\
-          \        batch_size: Batch size for training\n        learning_rate: Learning\
-          \ rate for optimizer\n        use_pretrained: Use pretrained ResNet18 weights\n\
-          \    \"\"\"\n    import os\n    import json\n    import torch\n    import\
-          \ torch.nn as nn\n    import torch.optim as optim\n    from torch.utils.data\
-          \ import DataLoader\n    from torchvision import datasets, transforms, models\n\
+          \    learning_rate: float = 0.001,\n    use_pretrained: bool = True,\n \
+          \   metrics_out: dsl.Output[dsl.Metrics] = None\n):\n    \"\"\"\n    Train\
+          \ dog breed classifier using PyTorch\n\n    Args:\n        data_dir: Directory\
+          \ containing training data\n        model_dir: Directory to save trained\
+          \ models\n        epochs: Number of training epochs\n        batch_size:\
+          \ Batch size for training\n        learning_rate: Learning rate for optimizer\n\
+          \        use_pretrained: Use pretrained ResNet18 weights\n    \"\"\"\n \
+          \   import os\n    import json\n    import torch\n    import torch.nn as\
+          \ nn\n    import torch.optim as optim\n    from torch.utils.data import\
+          \ DataLoader\n    from torchvision import datasets, transforms, models\n\
           \    from datetime import datetime\n    from PIL import Image\n    import\
           \ random\n\n    # Create sample dataset function\n    def create_sample_dataset(data_dir,\
           \ num_samples_per_breed=100):\n        \"\"\"Generate synthetic dog images\
@@ -198,7 +205,14 @@ deploymentSpec:
           \n    print(\"=\" * 70)\n    print(\" TRAINING COMPLETE!\")\n    print(f\"\
           \   Best Validation Accuracy: {best_val_acc:.2f}%\")\n    print(f\"   Models\
           \ saved to: {model_dir}\")\n    print(f\"   Completed: {datetime.now()}\"\
-          )\n    print(\"=\" * 70)\n\n"
+          )\n    print(\"=\" * 70)\n\n    # Log metrics for KFP UI visualization\n\
+          \    if metrics_out is not None:\n        metrics_out.log_metric('best_val_accuracy',\
+          \ float(best_val_acc))\n        metrics_out.log_metric('final_train_accuracy',\
+          \ float(metrics[-1]['train_acc']))\n        metrics_out.log_metric('final_val_accuracy',\
+          \ float(metrics[-1]['val_acc']))\n        metrics_out.log_metric('final_train_loss',\
+          \ float(metrics[-1]['train_loss']))\n        metrics_out.log_metric('final_val_loss',\
+          \ float(metrics[-1]['val_loss']))\n        metrics_out.log_metric('num_epochs',\
+          \ epochs)\n\n"
         image: pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
         resources:
           cpuLimit: 4.0
